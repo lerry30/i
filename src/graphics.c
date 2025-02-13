@@ -36,8 +36,16 @@ int init_sdl(void (*render)()) {
 
     bool running = true;
     SDL_Event event; // stores events like mouse clicks or key presses
+                     
+    // Fixed Frame Rate (Cap at 60 FPS)
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
+    Uint32 frameStart = 0;
+    int frameTime;
 
     while(running) {
+        frameStart = SDL_GetTicks();
+
         // there's a queue for events so this while loop process them one by one
         while(SDL_PollEvent(&event)) {  // Process all pending events
             if(event.type == SDL_QUIT) { // check if user tries to press close button to close, if so, the running will be set to false causing window to stop
@@ -50,30 +58,28 @@ int init_sdl(void (*render)()) {
         SDL_RenderClear(renderer); // after configuring the color will apply to clear the renderer
 
         // Render things here...
-        render(); // callback function to draw things
+        render(renderer); // callback function to draw things
 
         SDL_RenderPresent(renderer); // updates the screen to display what was drawn
+                                     
+        frameTime = SDL_GetTicks() - frameStart;
+
+        // Delay to maintain 60 FPS
+        if (frameDelay > frameTime) {
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 
     return 0;
 }
 
 void draw_line(int x1, int y1, int x2, int y2) {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-    SDL_RenderPresent(renderer);
 }
 
-void draw_rect(int16_t x, int16_t y, uint16_t width, uint16_t height) {
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = width;
-    rect.h = height;
-
-    SDL_SetRenderDrawColor(renderer, 0, 128, 128, 255);
+void draw_rect(int x, int y, int width, int height) {
+    SDL_Rect rect = {x, y, width, height};
     SDL_RenderFillRect(renderer, &rect);
-    SDL_RenderPresent(renderer);
 }
 
 void cleanup_sdl() {
