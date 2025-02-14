@@ -1,11 +1,10 @@
 #include "graphics.h"
-#include <stdio.h>
 
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
-int init_sdl(void (*render)()) {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) { // enable video related features(graphics, window creation)
+int init_sdl(void (*render)(SDL_Renderer *), void (*events)(SDL_Event *)) {
+    if(SDL_Init(SDL_INIT_VIDEO) != 0) { // enable video related features(graphics, window creation)
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return 1;
     }
@@ -15,7 +14,7 @@ int init_sdl(void (*render)()) {
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, // x, y make center on screen
                                           800, 600, // window width and height
                                           SDL_WINDOW_SHOWN); // makes window visible
-    if (!window) { // check if window is null
+    if(!window) { // check if window is null
         SDL_Log("Could not create window: %s", SDL_GetError());
         SDL_Quit();
         return 1;
@@ -27,7 +26,7 @@ int init_sdl(void (*render)()) {
             -1, // automatically selects the best graphic driver available
             SDL_RENDERER_ACCELERATED); // use hardware acceleration if available
 
-    if (!renderer) { // check if renderer is null
+    if(!renderer) { // check if renderer is null
         SDL_Log("Could not create renderer: %s", SDL_GetError());
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -52,6 +51,8 @@ int init_sdl(void (*render)()) {
                 printf("close window\n");
                 running = false;
             }
+
+            events(&event);
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // configure the color(rgba) for renderer(canvas)
