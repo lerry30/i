@@ -1,5 +1,5 @@
-#ifndef SINGLETON_H
-#define SINGLETON_H
+#ifndef S_INPUT_STATE_H
+#define S_INPUT_STATE_H
 
 typedef struct {
     void (*action)();

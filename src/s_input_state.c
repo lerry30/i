@@ -1,4 +1,4 @@
-#include "singleton.h"
+#include "s_input_state.h"
 
 static InputState input_state_instance = {0};
 
